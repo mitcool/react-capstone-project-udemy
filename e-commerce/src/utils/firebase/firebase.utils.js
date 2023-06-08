@@ -3,7 +3,9 @@ import {
     getAuth,
     signInWithRedirect,
     signInWithPopup,
-    GoogleAuthProvider
+    GoogleAuthProvider,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword
 } from 'firebase/auth';
 
 import { 
@@ -34,10 +36,12 @@ const firebaseConfig = {
 
   export const auth = getAuth();
   export const signInWithGooglePoput = () => signInWithPopup(auth,provider);
+  export const signInWithGoogleRedirect = () => signInWithRedirect(auth,provider)
 
   export const db = getFirestore();
 
-  export const createUserDocument = async (user) => {
+  export const createUserDocument = async (user,additionalInformation = {}) => {
+    if(!user) return;
     const userDocRef = doc(db,'users',user.uid); // user instance even if he doesn't exists in db
 
     const userSnapshot = await getDoc(userDocRef); //check if user exist in db
@@ -50,7 +54,8 @@ const firebaseConfig = {
             await setDoc(userDocRef,{
                 displayName,
                 email,
-                createdAt
+                createdAt,
+                ...additionalInformation
             })
         }catch(error){
             console.log(error.message)
@@ -58,4 +63,16 @@ const firebaseConfig = {
     }
 
     return userDocRef;
+  }
+
+  export const createAuthUserWithEmailAndPassword = async (email, password) => {
+     if(!email || !password) return;
+     return await createUserWithEmailAndPassword(auth,email,password)
+  }
+
+  export const signInUserWithEmailAndPassword = async (email, password) => {
+
+    if(!email || !password) return;
+
+    return await signInWithEmailAndPassword(auth,email,password);
   }
