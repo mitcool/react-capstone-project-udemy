@@ -1,9 +1,11 @@
-import {useState} from 'react'
+import {useState ,useContext} from 'react'
 
 import {signInWithGooglePoput,signInUserWithEmailAndPassword} from '../../utils/firebase/firebase.utils';
 
 import FormInput from '../form-input/form-input.component';
 import Button from '../button/button.component';
+
+import { UserContext } from '../../contexts/user.context';
 
 import './sign-in-form.styles.scss'
 
@@ -16,6 +18,8 @@ const SighInForm = () => {
     const [formFields,setFormFields] = useState(defaultFormFields);
     const {email,password} = formFields;
 
+    const {setCurrentUser} = useContext(UserContext);
+
     //Update the current input value in state
     const handleChange = (event) => {
         const {name,value} = event.target;
@@ -26,8 +30,9 @@ const SighInForm = () => {
         event.preventDefault();
         
         try{
-            const response = await signInUserWithEmailAndPassword(email,password);
-            console.log(response);
+            const {user} = await signInUserWithEmailAndPassword(email,password);
+            setCurrentUser(user);
+            //console.log(user);
             resetFormField();
         }catch(error){
             
